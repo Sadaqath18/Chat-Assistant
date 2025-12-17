@@ -3,43 +3,60 @@ document.addEventListener("DOMContentLoaded", () => {
   const chatbox = document.getElementById("chatbox");
   const closeBtn = document.getElementById("close-chat");
   const content = document.getElementById("chat-content");
-  const input = document.getElementById("user-input");
-  const sendBtn = document.getElementById("send-btn");
 
   let chatState = "GREETING";
+  let greetedOnce = false;
+  let leadSubmitted = false;
 
-  if (!pill || !chatbox) {
-    console.error("❌ Chatbot elements not found");
-    return;
-  }
+  let selectedOption = ""; // stores course or service
+  let flowType = ""; // TRAINING | SERVICE
+
+  /* ================= OPEN CHAT ================= */
 
   pill.onclick = () => {
-    console.log("✅ Pill clicked");
-
-    chatbox.classList.remove("hidden");
+    chatbox.classList.add("active");
     pill.style.display = "none";
 
-    content.innerHTML = "";
-    chatState = "GREETING";
+    if (!greetedOnce) {
+      fetchResponse("", "GREETING");
+      greetedOnce = true;
+    }
+  };
+
+  /* ================= CLOSE CHAT ================= */
+
+  closeBtn.onclick = () => {
+    chatbox.classList.remove("active");
+    pill.style.display = "flex";
+  };
+
+  /* ================= FETCH RESPONSE ================= */
+
+  function fetchResponse(message, state, meta = {}) {
+    if (message) addMessage(message, "user");
 
     fetch("/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: "", state: "GREETING" }),
+      body: JSON.stringify({ message, state, meta }),
     })
       .then((res) => res.json())
       .then((data) => {
-         addMessage(data.text, "bot");
-         addOptions(data.options);
-        chatState = data.nextState;
-      })
-      .catch((err) => console.error("❌ Init chat error:", err));
-  };
+        if (data.message) addMessage(data.message, "bot");
 
-  closeBtn.onclick = () => {
-    chatbox.classList.add("hidden");
-    pill.style.display = "flex";
-  };
+        if (data.showForm && !leadSubmitted) {
+          flowType = data.meta?.flowType || "";
+          addLeadForm();
+          return;
+        }
+
+        if (data.quick_replies) addOptions(data.quick_replies);
+        if (data.nextState) chatState = data.nextState;
+      })
+      .catch((err) => console.error("Chat error:", err));
+  }
+
+  /* ================= UI HELPERS ================= */
 
   function addMessage(text, type) {
     const div = document.createElement("div");
@@ -49,45 +66,69 @@ document.addEventListener("DOMContentLoaded", () => {
     content.scrollTop = content.scrollHeight;
   }
 
-  function clearOptions() {
-    document.querySelectorAll(".option").forEach((o) => o.remove());
-  }
+  /* ================= OPTIONS ================= */
 
   function addOptions(options) {
-    clearOptions();
     options.forEach((opt) => {
       const btn = document.createElement("div");
       btn.className = "option";
       btn.innerText = opt;
-      btn.onclick = () => send(opt);
+
+      btn.onclick = () => {
+        selectedOption = opt;
+
+        fetchResponse(opt, chatState, {
+          selection: selectedOption,
+          flowType,
+          leadSubmitted,
+        });
+      };
+
       content.appendChild(btn);
     });
   }
 
-  function send(message) {
-    if (message) addMessage(message, "user");
-    clearOptions();
+  /* ================= LEAD FORM ================= */
 
-    fetch("/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message, state: chatState }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.text) addMessage(data.text, "bot");
-        if (data.options) addOptions(data.options);
-        if (data.nextState) chatState = data.nextState;
+  function addLeadForm() {
+    leadSubmitted = true;
+
+    const form = document.createElement("div");
+    form.className = "lead-form";
+
+    form.innerHTML = `
+      <div class="form-title">Let’s get your details</div>
+      <input id="lead-name" placeholder="Your Name" />
+      <input id="lead-phone" placeholder="Mobile Number" />
+      <select id="lead-bg">
+        <option value="">Your Background</option>
+        <option>Student / Fresher</option>
+        <option>Working Professional</option>
+        <option>Career Switcher</option>
+      </select>
+      <button class="submit-btn">Submit</button>
+    `;
+
+    form.querySelector(".submit-btn").onclick = () => {
+      const name = document.getElementById("lead-name").value.trim();
+      const phone = document.getElementById("lead-phone").value.trim();
+      const bg = document.getElementById("lead-bg").value;
+
+      if (!name || phone.length < 10 || !bg) {
+        alert("Please fill all details correctly");
+        return;
+      }
+
+      addMessage(`Name: ${name}\nPhone: ${phone}\nBackground: ${bg}`, "user");
+
+      fetchResponse("", "LEAD_SUBMIT", {
+        selection: selectedOption,
+        flowType,
+        leadSubmitted: true,
+        lead: { name, phone, bg },
       });
+    };
+
+    content.appendChild(form);
   }
-
-  sendBtn.onclick = () => {
-    if (!input.value.trim()) return;
-    send(input.value);
-    input.value = "";
-  };
-
-  input.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") sendBtn.onclick();
-  });
 });

@@ -3,26 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GeekSpoc Assistant</title>
+    <title>GeekSpoc Chat Assistant</title>
     <link rel="stylesheet" href="widget.css" />
   </head>
   <body>
+    <!-- Floating Ask Button -->
     <div id="ask-pill">
-      <span class="ask-logo">G</span>
+      <div class="ask-logo">G</div>
       <span>Ask</span>
     </div>
 
+    <!-- Chat Widget -->
     <div id="chatbox" class="hidden">
       <div class="chat-top">
         <div class="chat-logo">G</div>
-        <div class="chat-title">GeekSpoc</div>
+        <div class="chat-title">
+          GeekSpoc Assistant
+          <span class="status">● Online</span>
+        </div>
         <button id="close-chat">✕</button>
       </div>
 
-      <div class="chat-content" id="chat-content"></div>
+      <div id="chat-content" class="chat-content"></div>
 
       <div class="chat-input">
-        <input id="user-input" placeholder="Ask GeekSpoc anything..." />
+        <input id="user-input" placeholder="Ask GeekSpoc..." />
         <button id="send-btn">➤</button>
       </div>
 
