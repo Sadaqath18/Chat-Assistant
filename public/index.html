@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GeekSpoc Assistant</title>
+    <link rel="stylesheet" href="widget.css" />
+  </head>
+  <body>
+    <div id="ask-pill">
+      <span class="ask-logo">G</span>
+      <span>Ask</span>
+    </div>
+
+    <div id="chatbox" class="hidden">
+      <div class="chat-top">
+        <div class="chat-logo">G</div>
+        <div class="chat-title">GeekSpoc</div>
+        <button id="close-chat">✕</button>
+      </div>
+
+      <div class="chat-content" id="chat-content"></div>
+
+      <div class="chat-input">
+        <input id="user-input" placeholder="Ask GeekSpoc anything..." />
+        <button id="send-btn">➤</button>
+      </div>
+
+      <div class="chat-footer">
+        GeekSpoc assistant may make mistakes. Verify important info.
+      </div>
+    </div>
+
+    <script src="widget.js" defer></script>
+  </body>
+</html>

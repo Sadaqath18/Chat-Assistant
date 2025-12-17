@@ -1,0 +1,14 @@
+{
+  "name": "geekspoc-ai-chatbot",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server/server.cjs"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "openai": "^4.52.0",
+    "dotenv": "^16.4.5"
+  }
+}
