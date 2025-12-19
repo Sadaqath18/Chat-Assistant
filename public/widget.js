@@ -11,6 +11,13 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedOption = ""; // stores course or service
   let flowType = ""; // TRAINING | SERVICE
 
+  let leadData = {
+    // stores lead details
+    name: "",
+    phone: "",
+    background: "",
+  };
+
   /* ================= OPEN CHAT ================= */
 
   pill.onclick = () => {
@@ -42,6 +49,11 @@ document.addEventListener("DOMContentLoaded", () => {
     })
       .then((res) => res.json())
       .then((data) => {
+        if (data.redirect) {
+          window.open(data.redirect, "_blank");
+          return;
+        }
+
         if (data.message) addMessage(data.message, "bot");
 
         if (data.showForm && !leadSubmitted) {
@@ -75,12 +87,33 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.innerText = opt;
 
       btn.onclick = () => {
-        selectedOption = opt;
+        // ✅ Update selection ONLY for courses/services
+
+        if (
+          opt.includes("Full") ||
+          opt.includes("AI") ||
+          opt.includes("Cyber") ||
+          opt.includes("Training")
+        ) {
+          selectedOption = opt;
+          flowType = "TRAINING";
+        }
+        if (
+          opt.includes("Website") ||
+          opt.includes("Mobile") ||
+          opt.includes("Digital") ||
+          opt.includes("Consult") ||
+          opt.includes("Service")
+        ) {
+          selectedOption = opt;
+          flowType = "SERVICE";
+        }
 
         fetchResponse(opt, chatState, {
           selection: selectedOption,
           flowType,
           leadSubmitted,
+          lead: leadData,
         });
       };
 
@@ -119,13 +152,16 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      leadData = { name, phone, background: bg };
+      leadSubmitted = true;
+
       addMessage(`Name: ${name}\nPhone: ${phone}\nBackground: ${bg}`, "user");
 
       fetchResponse("", "LEAD_SUBMIT", {
         selection: selectedOption,
         flowType,
         leadSubmitted: true,
-        lead: { name, phone, bg },
+        lead: leadData,
       });
     };
 
