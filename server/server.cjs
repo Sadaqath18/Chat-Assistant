@@ -1,8 +1,11 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
 
 app.use(express.json());
 app.use(express.static("public"));
+app.use(cors());
+app.use(express.json());
 
 const WHATSAPP_NUMBER = "919513357762";
 const WHATSAPP_BASE = `https://wa.me/${WHATSAPP_NUMBER}?text=`;
@@ -321,6 +324,10 @@ Please connect me with your team.
   }
 
   return res.json(INTENTS.FALLBACK);
+});
+
+app.post("/chat", async (req, res) => {
+  res.json({ message: "You said: ${req.body.message}" });
 });
 
 app.listen(3000, () => {
