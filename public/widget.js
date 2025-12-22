@@ -3,6 +3,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const chatbox = document.getElementById("chatbox");
   const closeBtn = document.getElementById("close-chat");
   const content = document.getElementById("chat-content");
+  const input = document.getElementById("user-input");
+  const sendBtn = document.getElementById("send-btn");
 
   let chatState = "GREETING";
   let greetedOnce = false;
@@ -30,6 +32,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
+  /* SEND MESSAGE */
+  function sendManualMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    fetchResponse(text, chatState, {
+      selection: text,
+      flowType,
+      leadSubmitted,
+      lead: leadData,
+    });
+
+    input.value = "";
+  }
+
+  /* Send button click */
+  sendBtn.onclick = sendManualMessage;
+
+  /* Enter key support */
+  input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendManualMessage();
+  });
+
   /* ================= CLOSE CHAT ================= */
 
   closeBtn.onclick = () => {
@@ -42,6 +67,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function fetchResponse(message, state, meta = {}) {
     if (message) addMessage(message, "user");
 
+    showTyping();
+
     fetch("/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -49,6 +76,8 @@ document.addEventListener("DOMContentLoaded", () => {
     })
       .then((res) => res.json())
       .then((data) => {
+        hideTyping();
+
         if (data.redirect) {
           window.open(data.redirect, "_blank");
           return;
@@ -69,6 +98,20 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ================= UI HELPERS ================= */
+
+  function showTyping() {
+    const typing = document.createElement("div");
+    typing.className = "bot typing";
+    typing.id = "typing-indicator";
+    typing.innerHTML = "Geekspoc is typing...";
+    content.appendChild(typing);
+    content.scrollTop = content.scrollHeight;
+  }
+
+  function hideTyping() {
+    const typing = document.getElementById("typing-indicator");
+    if (typing) typing.remove();
+  }
 
   function addMessage(text, type) {
     const div = document.createElement("div");

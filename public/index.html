@@ -9,25 +9,38 @@
   <body>
     <!-- Floating Ask Button -->
     <div id="ask-pill">
-      <div class="ask-logo">G</div>
-      <span>Ask</span>
+      <img
+        src="assets/geekspoc-logo.png"
+        alt="chat-logo"
+        class="ask-logo-img"
+      />
+      <span>Ask GeekSpoc</span>
     </div>
 
     <!-- Chat Widget -->
     <div id="chatbox" class="hidden">
       <div class="chat-top">
-        <div class="chat-logo">G</div>
+        <img
+          src="assets/geekspoc-logo.png"
+          alt="chat-logo"
+          class="chat-logo-img"
+        />
+
         <div class="chat-title">
           GeekSpoc Assistant
           <span class="status">● Online</span>
         </div>
+
         <button id="close-chat">✕</button>
       </div>
 
       <div id="chat-content" class="chat-content"></div>
+      <div id="typing-indicator" class="typing hidden">
+        GeekSpoc is typing<span>.</span><span>.</span><span>.</span>
+      </div>
 
       <div class="chat-input">
-        <input id="user-input" placeholder="Ask GeekSpoc..." />
+        <input id="user-input" type="text" placeholder="Ask GeekSpoc..." />
         <button id="send-btn">➤</button>
       </div>
 

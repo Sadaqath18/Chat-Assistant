@@ -232,6 +232,22 @@ Please connect me with your team.
     });
   }
 
+  //Admin Leads API
+  app.get("/api/admin/leads", (req, res) => {
+    try {
+      if (!fs.existsSync(LEADS_FILE)) {
+        return res.json([]);
+      }
+
+      const data = fs.readFileSync(LEADS_FILE, "utf-8");
+      const leads = data ? JSON.parse(data) : [];
+
+      res.json(leads);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to load leads" });
+    }
+  });
+
   // AFTER LEAD SUBMISSION
   if (state === "LEAD_SUBMIT") {
     const { selection, flowType, lead } = meta;
