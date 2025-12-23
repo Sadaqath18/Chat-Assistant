@@ -16,7 +16,7 @@ app.use(
   })
 );
 app.use(express.json());
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 
 const WHATSAPP_NUMBER = "919513357762";
 const WHATSAPP_BASE = `https://wa.me/${WHATSAPP_NUMBER}?text=`;
