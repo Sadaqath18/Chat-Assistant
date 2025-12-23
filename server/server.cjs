@@ -4,7 +4,17 @@ const fs = require("fs");
 const path = require("path");
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "https://geekspoc.com",
+      "https://www.geekspoc.com",
+      "https://staging.geekspoc.com",
+    ],
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.static("public"));
 
