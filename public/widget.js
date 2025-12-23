@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     showTyping();
 
-    fetch("/chat", {
+    fetch("https://chat-assistant-9d2y.onrender.com/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message, state, meta }),

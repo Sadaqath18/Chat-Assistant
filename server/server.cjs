@@ -1,17 +1,16 @@
 const express = require("express");
-const app = express();
 const cors = require("cors");
+const fs = require("fs");
+const path = require("path");
 
-app.use(express.json());
-app.use(express.static("public"));
+const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.static("public"));
 
 const WHATSAPP_NUMBER = "919513357762";
 const WHATSAPP_BASE = `https://wa.me/${WHATSAPP_NUMBER}?text=`;
 
-const fs = require("fs");
-const path = require("path");
 const LEADS_FILE = path.join(__dirname, "leads.json");
 
 function saveLead(lead) {
@@ -195,6 +194,22 @@ const BUTTON_MAP = {
   "🧠 Free Consultation": { intent: "FALLBACK" },
 };
 
+//Admin Leads API
+app.get("/api/admin/leads", (req, res) => {
+  try {
+    if (!fs.existsSync(LEADS_FILE)) {
+      return res.json([]);
+    }
+
+    const data = fs.readFileSync(LEADS_FILE, "utf-8");
+    const leads = data ? JSON.parse(data) : [];
+
+    res.json(leads);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load leads" });
+  }
+});
+
 /* ---------------- CHAT API ---------------- */
 
 app.post("/chat", (req, res) => {
@@ -234,22 +249,6 @@ Please connect me with your team.
       redirect: `${WHATSAPP_BASE}${encodeURIComponent(text)}`,
     });
   }
-
-  //Admin Leads API
-  app.get("/api/admin/leads", (req, res) => {
-    try {
-      if (!fs.existsSync(LEADS_FILE)) {
-        return res.json([]);
-      }
-
-      const data = fs.readFileSync(LEADS_FILE, "utf-8");
-      const leads = data ? JSON.parse(data) : [];
-
-      res.json(leads);
-    } catch (err) {
-      res.status(500).json({ error: "Failed to load leads" });
-    }
-  });
 
   // AFTER LEAD SUBMISSION
   if (state === "LEAD_SUBMIT") {
@@ -326,8 +325,9 @@ Please connect me with your team.
   return res.json(INTENTS.FALLBACK);
 });
 
-app.post("/chat", async (req, res) => {
-  res.json({ message: "You said: ${req.body.message}" });
+/*Health Check Endpoint*/
+app.get("/health", (req, res) => {
+  res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
 app.listen(3000, () => {
