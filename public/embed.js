@@ -1,3 +1,4 @@
+console.log("Geek Spoc embed.js loaded");
 (function () {
   if (window.__GEEK_SPOC_CHAT_LOADED__) return;
   window.__GEEK_SPOC_CHAT_LOADED__ = true;

@@ -1,24 +1,22 @@
 const express = require("express");
-const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 
 const app = express();
-app.use(
-  cors({
-    origin: [
-      "https://geekspoc.com",
-      "https://www.geekspoc.com",
-      "https://staging.geekspoc.com",
-    ],
-    methods: ["GET", "POST"],
-    credentials: true,
-  })
-);
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  next();
+});
+
+app.options("*", (req, res) => {
+  res.sendStatus(200);
+});
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-const WHATSAPP_NUMBER = "919513357762";
+const WHATSAPP_NUMBER = "whatsapp:" + process.env.WHATSAPP;
 const WHATSAPP_BASE = `https://wa.me/${WHATSAPP_NUMBER}?text=`;
 
 const LEADS_FILE = path.join(__dirname, "leads.json");
@@ -340,6 +338,8 @@ app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
-app.listen(3000, () => {
-  console.log("✅ Server running at http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });
